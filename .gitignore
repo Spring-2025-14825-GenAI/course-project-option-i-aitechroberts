@@ -1,1 +1,3 @@
 venv/
+.env
+nih_key.json
