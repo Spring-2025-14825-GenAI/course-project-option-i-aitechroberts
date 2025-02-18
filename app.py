@@ -10,8 +10,14 @@ from langchain.embeddings import VertexAIEmbeddings
 from langchain.chat_models import ChatVertexAI
 # Import message types (depending on your LangChain version, these may be in langchain.schema)
 from langchain.schema import HumanMessage, SystemMessage, AIMessage
+import getpass
+import os
 
 load_dotenv()
+
+os.environ["LANGSMITH_TRACING"] = "true"
+os.environ["LANGSMITH_API_KEY"] = os.getenv("LANGSMITH_API_KEY")
+
 # Set your VertexAI credentials and initialize VertexAI.
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "./nih_key.json"
 PROJECT_ID = "nih-cl-cm500-jrobert3-1e1c"  # Replace with your project id
