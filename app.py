@@ -2,15 +2,13 @@ import streamlit as st
 import os
 from dotenv import load_dotenv
 import vertexai
-# Use Chroma as the vector store instead of Pinecone
 from langchain.vectorstores import Chroma
-# Use Vertex AI’s embeddings
-from langchain.embeddings import VertexAIEmbeddings
-# Use Vertex AI’s chat model
-from langchain.chat_models import ChatVertexAI
+from langchain.chains import LLMChain
+from langchain_google_vertexai import VertexAIEmbeddings
+from langchain_google_vertexai import VertexAI
+
 # Import message types (depending on your LangChain version, these may be in langchain.schema)
 from langchain.schema import HumanMessage, SystemMessage, AIMessage
-import getpass
 import os
 
 load_dotenv()
@@ -27,8 +25,8 @@ vertexai.init(project=PROJECT_ID, location=REGION)
 
 st.title("Chatbot")
 
-# Initialize the embeddings model using Vertex AI
-embeddings = VertexAIEmbeddings()  # You can pass additional parameters if needed
+# Now instantiate the embeddings
+embeddings = VertexAIEmbeddings(model_name="textembedding-gecko-multilingual@latest")
 
 # Initialize the Chroma vector store (assumes a pre-populated collection in the "db" directory)
 vector_store = Chroma(
@@ -63,15 +61,17 @@ if prompt:
     st.session_state.messages.append(HumanMessage(prompt))
 
     # Initialize the Vertex AI chat model
-    llm = ChatVertexAI(
-        model_name="claude-3-haiku@20240307",  # Change model_name if desired
-        temperature=0.3
+    llm = VertexAI(
+        model_name="gemini-1.5-pro-002",  # Change model_name if desired
+        temperature=0.3,
+        allow_image_uploads=False,
+        verbose=True
     )
 
     # Create a retriever from the vector store (using similarity search)
     retriever = vector_store.as_retriever(
         search_type="similarity",
-        search_kwargs={"k": 5}  # Retrieve top 3 relevant documents
+        search_kwargs={"k": 2}  # Retrieve top 3 relevant documents
     )
     # Retrieve documents relevant to the prompt
     docs = retriever.get_relevant_documents(prompt)
@@ -89,7 +89,7 @@ if prompt:
     st.session_state.messages.append(SystemMessage(system_prompt_fmt))
 
     # Invoke the Vertex AI LLM with the full message history
-    result = llm.invoke(st.session_state.messages).content
+    result = llm.invoke(st.session_state.messages)
 
     # Display the assistant's response and add it to the session state
     with st.chat_message("assistant"):
