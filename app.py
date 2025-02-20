@@ -41,34 +41,38 @@ vector_store = Chroma(
 # -------------------------------------------------
 # Step 1: Ingest PDFs from the "documents/" directory and add to vector store.
 # -------------------------------------------------
-
-# Get list of all PDF files in the directory "documents"
-pdf_files = glob.glob(os.path.join("documents", "*.pdf"))
-all_chunks = []  # To store all document chunks
-
-if len(all_chunks) == 0:
+@st.cache_resource(show_spinner=False)
+def load_vector_store():
+    # Load and index PDFs only once
+    all_chunks = []
+    pdf_files = glob.glob(os.path.join("documents", "*.pdf"))
     if pdf_files:
-        st.write("Indexing PDF documents from the 'documents/' folder...")
         for pdf_path in pdf_files:
-            try:
-                loader = PyPDFLoader(pdf_path)
-                pages = loader.load()
-                splitter = RecursiveCharacterTextSplitter(
-                    chunk_size=1000,
-                    chunk_overlap=200,
-                )
-                chunks = splitter.split_documents(pages)
-                all_chunks.extend(chunks)
-                st.write(f"Loaded {len(chunks)} chunks from {os.path.basename(pdf_path)}")
-            except Exception as e:
-                st.error(f"Error processing {pdf_path}: {e}")
-        
-        if all_chunks:
-            # Add the chunks to the vector store. This will index them using the embedding model.
-            vector_store.add_documents(all_chunks)
-            st.write(f"Added {len(all_chunks)} document chunks to the vector store.")
+            loader = PyPDFLoader(pdf_path)
+            pages = loader.load()
+            splitter = RecursiveCharacterTextSplitter(
+                chunk_size=1000,
+                chunk_overlap=200,
+            )
+            chunks = splitter.split_documents(pages)
+            all_chunks.extend(chunks)
     else:
-        st.write("No PDF files found in the 'documents/' directory.")
+        st.write("No PDFs found in 'documents/' directory.")
+
+    # Create the vector store and add the document chunks
+    embedding_model = VertexAIEmbeddings(model_name="text-embedding-004")
+    vector_store = Chroma(
+        persist_directory="db",
+        embedding_function=embedding_model,
+        collection_name="research_collection"
+    )
+    if all_chunks:
+        vector_store.add_documents(all_chunks)
+        st.write(f"Added {len(all_chunks)} document chunks to the vector store.")
+    return vector_store
+
+# Load or create the vector store only once per session.
+vector_store = load_vector_store()
 
 # -------------------------------------------------
 # Step 2: Initialize chat history.
@@ -102,7 +106,7 @@ if user_prompt:
     # Step 3: Retrieve relevant context from the vector store.
     # -------------------------------------------------
     retriever = vector_store.as_retriever(
-        search_type="similarity",
+        search_type="mmr",
         search_kwargs={"k": 2}  # Adjust the number of retrieved documents as needed
     )
     retrieved_docs = retriever.get_relevant_documents(user_prompt)
@@ -116,7 +120,7 @@ if user_prompt:
         template=(
             "You are an assistant for question-answering tasks. "
             "Whatever language the question was asked in, respond in that language."
-            "Based on the context provided, answer the following question concisely (up to three sentences). "
+            "Based on the context provided, answer the following question concisely, but fully. "
             "If you don't know the answer, simply say you don't know.\n\n"
             "Context:\n{context}\n\n"
             "Question:\n{question}"
