@@ -29,6 +29,7 @@ st.title("RAG Chatbot with PDF Ingestion")
 
 # Use a consistent embeddings model for both vector store creation and PDF processing.
 EMBEDDING_MODEL_NAME = "text-embedding-004"
+LLM_MODEL_NAME=""
 embedding_model = VertexAIEmbeddings(model_name=EMBEDDING_MODEL_NAME)
 
 # Initialize the Chroma vector store (using a persistent directory "db")
@@ -45,7 +46,7 @@ vector_store = Chroma(
 def load_vector_store():
     # Load and index PDFs only once
     all_chunks = []
-    pdf_files = glob.glob(os.path.join("documents", "*.pdf"))
+    pdf_files = glob.glob(os.path.join("url_documents", "*.pdf"))
     if pdf_files:
         for pdf_path in pdf_files:
             loader = PyPDFLoader(pdf_path)
@@ -110,8 +111,10 @@ if user_prompt:
         search_kwargs={"k": 2}  # Adjust the number of retrieved documents as needed
     )
     retrieved_docs = retriever.get_relevant_documents(user_prompt)
-    print("!!!!" + retrieved_docs)
-    st.markdown(retrieved_docs)
+    st.write(retrieved_docs)
+    urls = []
+    for doc in retrieved_docs:
+        urls.append(doc.metadata.get("sourceurl"))
     docs_text = "\n\n".join(d.page_content for d in retrieved_docs)
     
     # -------------------------------------------------
@@ -126,6 +129,7 @@ if user_prompt:
             "If you don't know the answer, simply say you don't know.\n\n"
             "Context:\n{context}\n\n"
             "Question:\n{question}"
+            ""
         )
     )
     
@@ -145,5 +149,5 @@ if user_prompt:
     
     # Display and store the assistant's response
     with st.chat_message("assistant"):
-        st.markdown(answer)
+        st.markdown(answer + f"1.{urls[0]}        2. {urls[1]}")
     st.session_state.messages.append(AIMessage(answer))
