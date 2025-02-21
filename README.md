@@ -9,6 +9,12 @@ Project Authors: Nicholas Chermak and Jonathan Roberts
 #### Flowise
 ![alt text](flowise.png)
 
+#### Limitations and Assumptions
+The limitations of our application are numerous but in the context of our assumptions become more reasonable.
+Assuming a small research team with a maximal document need and specific questions to ask, we do not hit the normal limits of compute, autoscaled deployment, optimized application serving and latency, etc. However, in the user domain, this app is quite limited as we (1) do not enable drag and drop for instance (2) do not enable a massive context window (3) limit the system prompt template to being concise which can limit user usefulness if you really need a collection of documents compared side by side in detail as one might in preparing a lit review (4) limited default model and the inability to change models or embeddings in app (5) No in memory document upload or configurable temperature in app
+
+So there are many, but this app does enable a significant proof of concept that would form the basis for a very useful tool to a research team.
+
 #### LangSmith Traces
 ![alt text](traces.png)
 
