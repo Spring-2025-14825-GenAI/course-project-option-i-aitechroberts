@@ -106,10 +106,12 @@ if user_prompt:
     # Step 3: Retrieve relevant context from the vector store.
     # -------------------------------------------------
     retriever = vector_store.as_retriever(
-        search_type="mmr",
+        search_type="similarity",
         search_kwargs={"k": 2}  # Adjust the number of retrieved documents as needed
     )
     retrieved_docs = retriever.get_relevant_documents(user_prompt)
+    print("!!!!" + retrieved_docs)
+    st.markdown(retrieved_docs)
     docs_text = "\n\n".join(d.page_content for d in retrieved_docs)
     
     # -------------------------------------------------
