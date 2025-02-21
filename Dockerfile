@@ -1,6 +1,6 @@
 FROM python:3.10
 WORKDIR /app
-COPY /url_documents /url_documents
+COPY url_documents/ url_documents/
 COPY nih_key.json nih_key.json
 COPY .env .env
 COPY requirements.txt requirements.txt

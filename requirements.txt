@@ -4,3 +4,6 @@ langchain-core
 langchain-google-vertexai 
 streamlit
 python-dotenv
+langchain-community
+chromadb
+pypdf
