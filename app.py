@@ -33,7 +33,7 @@ LLM_MODEL_NAME="gemini-1.5-pro-002"
 embedding_model = VertexAIEmbeddings(model_name=EMBEDDING_MODEL_NAME)
 
 # -------------------------------------------------
-# Step 1: Ingest PDFs from the "documents/" directory and add to vector store.
+# Step 1: Ingest PDFs from the "url_documents/" directory and add to vector store.
 # -------------------------------------------------
 @st.cache_resource(show_spinner=False)
 def load_vector_store():
