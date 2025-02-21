@@ -29,15 +29,8 @@ st.title("RAG Chatbot with PDF Ingestion")
 
 # Use a consistent embeddings model for both vector store creation and PDF processing.
 EMBEDDING_MODEL_NAME = "text-embedding-004"
-LLM_MODEL_NAME=""
+LLM_MODEL_NAME="gemini-1.5-pro-002"
 embedding_model = VertexAIEmbeddings(model_name=EMBEDDING_MODEL_NAME)
-
-# Initialize the Chroma vector store (using a persistent directory "db")
-vector_store = Chroma(
-    persist_directory="db",
-    embedding_function=embedding_model,
-    collection_name="research_collection"  # Update as needed
-)
 
 # -------------------------------------------------
 # Step 1: Ingest PDFs from the "documents/" directory and add to vector store.
@@ -135,7 +128,7 @@ if user_prompt:
     
     # Initialize the Vertex AI chat model
     llm = VertexAI(
-        model_name="gemini-1.5-pro-002",  # Change model_name if desired
+        model_name=LLM_MODEL_NAME,  # Change model_name if desired
         temperature=0.3,
         allow_image_uploads=False,
         verbose=True
