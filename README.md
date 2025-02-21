@@ -1,5 +1,17 @@
 Project Authors: Nicholas Chermak and Jonathan Roberts
 
+**Important files for Graders**
+- app.py
+- Dockerfile
+- url_documents - our downloaded and preprocessed papers
+- requirements.text
+
+#### Flowise
+![alt text](flowise.png)
+
+#### LangSmith Traces
+![alt text](traces.png)
+
 ### Instructions to Deploy
 1. Spin up necessary resources in cloud service provider
 - Kubernetes Cluster
