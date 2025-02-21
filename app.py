@@ -32,15 +32,10 @@ EMBEDDING_MODEL_NAME = "text-embedding-004"
 LLM_MODEL_NAME=""
 embedding_model = VertexAIEmbeddings(model_name=EMBEDDING_MODEL_NAME)
 
-# Initialize the Chroma vector store (using a persistent directory "db")
-vector_store = Chroma(
-    persist_directory="db",
-    embedding_function=embedding_model,
-    collection_name="research_collection"  # Update as needed
-)
+
 
 # -------------------------------------------------
-# Step 1: Ingest PDFs from the "documents/" directory and add to vector store.
+# Step 1: Ingest PDFs from the "url_documents/" directory and add to vector store.
 # -------------------------------------------------
 @st.cache_resource(show_spinner=False)
 def load_vector_store():
